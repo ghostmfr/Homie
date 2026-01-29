@@ -1,0 +1,22 @@
+# Xcode
+.build/
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+
+# macOS
+.DS_Store
+*.swp
+*~
+
+# Secrets
+*.p12
+*.mobileprovision
+*.provisionprofile
+
+# Build artifacts
+*.app
+*.ipa
+*.dSYM.zip
+*.dSYM

@@ -1,53 +1,79 @@
-# lil homie 🏠💨
+<p align="center">
+  <img src="docs/images/icon.png" width="128" alt="lil homie icon">
+</p>
 
-> runs so you don't have to.
+<h1 align="center">lil homie</h1>
 
-A friendly HomeKit REST API + CLI for macOS. Control your smart home from the terminal, scripts, or any automation tool.
+<p align="center">
+  <strong>HomeKit REST API + CLI for macOS</strong><br>
+  <em>runs so you don't have to.</em>
+</p>
 
-![Platform](https://img.shields.io/badge/platform-macOS%2013%2B-blue)
-![License](https://img.shields.io/badge/license-MIT-green)
+<p align="center">
+  <img src="https://img.shields.io/badge/platform-macOS%2013%2B-blue" alt="Platform">
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="License">
+  <img src="https://img.shields.io/github/v/release/ghostmfr/lilhomie" alt="Release">
+</p>
 
-## Features
+---
 
-- 🏠 **Native HomeKit** — Control all your HomeKit devices
-- 🌐 **REST API** — Local server on port 8420
-- ⌨️ **CLI Tool** — `lilhomie` for terminal access
-- 🎭 **Personality** — A mascot that reacts to what's happening
-- 🔒 **Local Only** — Never touches the internet
+**lil homie** exposes your HomeKit devices via a local REST API and CLI. Control lights, switches, and scenes from scripts, terminals, webhooks, or any automation tool.
 
-## Quick Start
+- 🌐 **REST API** on `localhost:8420`
+- ⌨️ **CLI** — `lilhomie` command
+- 🏠 **Native HomeKit** — uses Apple's HomeKit framework
+- 🔒 **Local only** — never touches the internet
+
+---
+
+## Installation
+
+### Download
+
+Grab the latest release:
+
+👉 **[Download lil homie](https://github.com/ghostmfr/lilhomie/releases/latest)**
+
+- `lil-homie-v1.0-mac.zip` — macOS app
+- `lilhomie-cli-v1.0.zip` — CLI binary
+
+### Setup
+
+1. Unzip and drag **lil homie.app** to Applications
+2. Launch and grant HomeKit access when prompted
+3. Server starts automatically on port 8420
+
+### CLI Installation
 
 ```bash
-# Clone
-git clone https://github.com/ghostmfr/lilhomie.git
-cd lilhomie
-
-# Open in Xcode
-open Homie.xcodeproj
-
-# Build and run (requires Apple Developer account for HomeKit entitlement)
+# Download and install
+curl -L https://github.com/ghostmfr/lilhomie/releases/latest/download/lilhomie-cli-v1.0.zip -o lilhomie.zip
+unzip lilhomie.zip
+sudo mv lilhomie /usr/local/bin/
 ```
 
-Grant HomeKit access when prompted, and you're good to go.
+---
 
 ## REST API
 
-lil homie runs a local API on `http://localhost:8420`.
+The API runs on `http://localhost:8420` while the app is running.
+
+> **Tip:** Use underscores for spaces in device/room names: `Desk_Lamp`
 
 ### Devices
 
 ```bash
 # List all devices
-curl http://localhost:8420/devices
+curl localhost:8420/devices
 
-# Get device details
-curl http://localhost:8420/device/Desk_Lamp
+# Get device info
+curl localhost:8420/device/Desk_Lamp
 
-# Toggle a device (use underscores for spaces)
-curl -X POST http://localhost:8420/device/Desk_Lamp/toggle
+# Toggle
+curl -X POST localhost:8420/device/Desk_Lamp/toggle
 
-# Set brightness (0-100)
-curl -X POST http://localhost:8420/device/Desk_Lamp/set \
+# Set brightness
+curl -X POST localhost:8420/device/Desk_Lamp/set \
   -H "Content-Type: application/json" \
   -d '{"brightness": 50}'
 ```
@@ -55,74 +81,87 @@ curl -X POST http://localhost:8420/device/Desk_Lamp/set \
 ### Rooms
 
 ```bash
-# List all rooms
-curl http://localhost:8420/rooms
+# List rooms
+curl localhost:8420/rooms
 
-# Get devices in a room
-curl http://localhost:8420/room/Office
+# All devices in room
+curl localhost:8420/room/Office
 
-# Turn all devices in room on/off
-curl -X POST http://localhost:8420/room/Office/on
-curl -X POST http://localhost:8420/room/Office/off
-
-# Toggle specific device in room
-curl -X POST http://localhost:8420/room/Office/device/Desk_Lamp/toggle
+# Room on/off
+curl -X POST localhost:8420/room/Office/on
+curl -X POST localhost:8420/room/Office/off
 ```
 
 ### Scenes
 
 ```bash
-# List all scenes
-curl http://localhost:8420/scenes
+# List scenes
+curl localhost:8420/scenes
 
-# Trigger a scene
-curl -X POST http://localhost:8420/scene/Good_Night/trigger
+# Trigger scene
+curl -X POST localhost:8420/scene/Good_Night/trigger
 ```
+
+---
 
 ## CLI
 
 ```bash
-# Install CLI
-sudo cp lilhomie-cli/lilhomie /usr/local/bin/
+lilhomie list                    # List all devices
+lilhomie status "Desk Lamp"      # Device status
+lilhomie on "Desk Lamp"          # Turn on
+lilhomie off "Desk Lamp"         # Turn off
+lilhomie toggle "Desk Lamp"      # Toggle
+lilhomie set "Desk Lamp" -b 50   # Set brightness
 
-# List devices
-lilhomie list
-
-# Device status
-lilhomie status "Desk Lamp"
-
-# Control devices
-lilhomie on "Desk Lamp"
-lilhomie off "Desk Lamp"
-lilhomie toggle "Desk Lamp"
-lilhomie set "Desk Lamp" --brightness 50
-
-# Scenes
-lilhomie scenes
-lilhomie scene "Good Night"
+lilhomie scenes                  # List scenes
+lilhomie scene "Good Night"      # Trigger scene
 ```
 
-## App Settings
+---
 
-- **Start with computer** — Launch at login
-- **Start server automatically** — Auto-start the API server
-- **Hide from Dock** — Run as menu bar app only
-- **Reset HomeKit Access** — Re-request HomeKit permissions
+## Use Cases
+
+- **Home automation scripts** — bash, Python, Node.js
+- **Stream Deck buttons** — trigger via curl
+- **Raycast/Alfred** — quick device control
+- **Webhooks** — IFTTT, n8n, Home Assistant
+- **Cron jobs** — scheduled lighting
+- **SSH** — control home from anywhere
+
+---
 
 ## Requirements
 
 - macOS 13.0 (Ventura) or later
-- Apple Developer Program — required for HomeKit entitlement
-- HomeKit-enabled devices
-
-## Known Issues
-
-- Toggle response returns inverted `isOn` state ([#1](https://github.com/ghostmfr/lilhomie/issues/1))
-
-## License
-
-MIT License — see [LICENSE](LICENSE) for details.
+- Apple Developer account (for HomeKit entitlement)
+- HomeKit-compatible devices
 
 ---
 
-Built with 🏠💨 by [Ghost Manufacture](https://github.com/ghostmfr)
+## Building from Source
+
+```bash
+git clone https://github.com/ghostmfr/lilhomie.git
+cd lilhomie
+open Homie.xcodeproj
+# Build and run in Xcode
+```
+
+---
+
+## Known Issues
+
+See [Issues](https://github.com/ghostmfr/lilhomie/issues) for current bugs.
+
+---
+
+## License
+
+MIT — see [LICENSE](LICENSE)
+
+---
+
+<p align="center">
+  Built with 🏠💨 by <a href="https://github.com/ghostmfr">Ghost Manufacture</a>
+</p>

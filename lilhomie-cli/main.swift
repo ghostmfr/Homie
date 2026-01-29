@@ -218,27 +218,27 @@ func showStatus() {
 
 func printUsage() {
     print("""
-    hkctl - Homie CLI
+    lilhomie - Homie CLI
     
     Usage:
-      hkctl list                    List all devices (grouped by room)
-      hkctl scenes                  List all scenes
-      hkctl status <name>           Get device status
-      hkctl toggle <name>           Toggle device on/off
-      hkctl on <name>               Turn device on
-      hkctl off <name>              Turn device off
-      hkctl set <name> <0-100>      Set brightness level
-      hkctl scene <name>            Trigger a scene
-      hkctl info                    Show Homie status
-      hkctl help                    Show this help
+      lilhomie list                    List all devices (grouped by room)
+      lilhomie scenes                  List all scenes
+      lilhomie status <name>           Get device status
+      lilhomie toggle <name>           Toggle device on/off
+      lilhomie on <name>               Turn device on
+      lilhomie off <name>              Turn device off
+      lilhomie set <name> <0-100>      Set brightness level
+      lilhomie scene <name>            Trigger a scene
+      lilhomie info                    Show Homie status
+      lilhomie help                    Show this help
     
     Device/scene names support fuzzy matching.
     
     Examples:
-      hkctl toggle "Office Lamp"
-      hkctl on office
-      hkctl set kitchen 50
-      hkctl scene "Good Night"
+      lilhomie toggle "Office Lamp"
+      lilhomie on office
+      lilhomie set kitchen 50
+      lilhomie scene "Good Night"
     """)
 }
 
@@ -260,35 +260,35 @@ case "scenes":
     
 case "status", "get":
     guard args.count > 1 else {
-        print("Usage: hkctl status <device-name>")
+        print("Usage: lilhomie status <device-name>")
         exit(1)
     }
     getStatus(args[1...].joined(separator: " "))
     
 case "toggle":
     guard args.count > 1 else {
-        print("Usage: hkctl toggle <device-name>")
+        print("Usage: lilhomie toggle <device-name>")
         exit(1)
     }
     toggleDevice(args[1...].joined(separator: " "))
     
 case "on":
     guard args.count > 1 else {
-        print("Usage: hkctl on <device-name>")
+        print("Usage: lilhomie on <device-name>")
         exit(1)
     }
     setDevice(args[1...].joined(separator: " "), on: true)
     
 case "off":
     guard args.count > 1 else {
-        print("Usage: hkctl off <device-name>")
+        print("Usage: lilhomie off <device-name>")
         exit(1)
     }
     setDevice(args[1...].joined(separator: " "), on: false)
     
 case "set":
     guard args.count > 2, let level = Int(args.last!) else {
-        print("Usage: hkctl set <device-name> <0-100>")
+        print("Usage: lilhomie set <device-name> <0-100>")
         exit(1)
     }
     let name = args[1..<(args.count-1)].joined(separator: " ")
@@ -296,7 +296,7 @@ case "set":
     
 case "scene":
     guard args.count > 1 else {
-        print("Usage: hkctl scene <scene-name>")
+        print("Usage: lilhomie scene <scene-name>")
         exit(1)
     }
     triggerScene(args[1...].joined(separator: " "))

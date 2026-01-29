@@ -5,11 +5,13 @@ class HTTPServer {
     private var listener: NWListener?
     private let homeKitManager: HomeKitManager
     private let ruleEngine: RuleEngine
+    private let homieState: HomieState
     private let port: UInt16 = 8420
     
-    init(homeKitManager: HomeKitManager, ruleEngine: RuleEngine) {
+    init(homeKitManager: HomeKitManager, ruleEngine: RuleEngine, homieState: HomieState) {
         self.homeKitManager = homeKitManager
         self.ruleEngine = ruleEngine
+        self.homieState = homieState
     }
     
     func start() {
@@ -78,6 +80,7 @@ class HTTPServer {
         }
         
         let method = String(parts[0])
+        // URL decode only - underscore replacement happens when extracting names
         let path = String(parts[1]).removingPercentEncoding ?? String(parts[1])
         
         var body: [String: Any]? = nil
@@ -93,6 +96,7 @@ class HTTPServer {
     
     private func route(method: String, path: String, body: [String: Any]?) -> String {
         NSLog("[HTTP] \(method) \(path)")
+        homieState.incrementRequestCount()
         
         // MARK: - Health & Debug
         
@@ -125,8 +129,43 @@ class HTTPServer {
             return jsonResponse(["devices": devices])
         }
         
-        if method == "GET" && path.hasPrefix("/device/") && !path.contains("/toggle") && !path.contains("/set") {
-            let id = String(path.dropFirst("/device/".count))
+        // Device schema
+        if method == "GET" && path.hasSuffix("/schema") {
+            let pathWithoutSchema = String(path.dropLast("/schema".count))
+            let id = normalizeName(String(pathWithoutSchema.dropFirst("/device/".count)))
+            
+            guard let device = homeKitManager.getDevice(byId: id) ?? homeKitManager.getDevice(byName: id) else {
+                return errorResponse(404, "Device not found")
+            }
+            
+            var schema: [String: Any] = [
+                "device": device.name,
+                "type": device.type.rawValue,
+                "properties": [String: Any]()
+            ]
+            
+            var properties: [String: Any] = [
+                "on": ["type": "boolean", "description": "Turn device on or off"]
+            ]
+            
+            // Add brightness for lights
+            if device.type == .light {
+                properties["brightness"] = [
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 100,
+                    "description": "Brightness percentage"
+                ]
+            }
+            
+            schema["properties"] = properties
+            schema["example"] = exampleBody(for: device)
+            
+            return jsonResponse(schema)
+        }
+        
+        if method == "GET" && path.hasPrefix("/device/") && !path.contains("/toggle") && !path.contains("/set") && !path.contains("/schema") {
+            let id = normalizeName(String(path.dropFirst("/device/".count)))
             NSLog("[HTTP] Looking up device: '\(id)'")
             if let device = homeKitManager.getDevice(byId: id) ?? homeKitManager.getDevice(byName: id) {
                 return jsonResponse(deviceToDict(device))
@@ -143,9 +182,9 @@ class HTTPServer {
             }
         }
         
-        if method == "POST" && path.hasSuffix("/toggle") {
+        if method == "POST" && path.hasSuffix("/toggle") && !path.contains("/room/") {
             let pathWithoutToggle = String(path.dropLast("/toggle".count))
-            let id = String(pathWithoutToggle.dropFirst("/device/".count))
+            let id = normalizeName(String(pathWithoutToggle.dropFirst("/device/".count)))
             NSLog("[HTTP] Toggle device: '\(id)'")
             
             guard let device = homeKitManager.getDevice(byId: id) ?? homeKitManager.getDevice(byName: id) else {
@@ -179,9 +218,9 @@ class HTTPServer {
             return errorResponse(500, "Failed to toggle device")
         }
         
-        if method == "POST" && path.hasSuffix("/set") {
+        if method == "POST" && path.hasSuffix("/set") && !path.contains("/room/") {
             let pathWithoutSet = String(path.dropLast("/set".count))
-            let id = String(pathWithoutSet.dropFirst("/device/".count))
+            let id = normalizeName(String(pathWithoutSet.dropFirst("/device/".count)))
             
             guard let device = homeKitManager.getDevice(byId: id) ?? homeKitManager.getDevice(byName: id) else {
                 return errorResponse(404, "Device not found")
@@ -209,6 +248,178 @@ class HTTPServer {
             return errorResponse(500, "Failed to set device state")
         }
         
+        // MARK: - Rooms
+        
+        if method == "GET" && path == "/rooms" {
+            let rooms = Set(homeKitManager.devices.compactMap { $0.roomName }).sorted()
+            let roomData = rooms.map { room -> [String: Any] in
+                let devicesInRoom = homeKitManager.devices.filter { $0.roomName == room }
+                let onCount = devicesInRoom.filter { $0.isOn }.count
+                return [
+                    "name": room,
+                    "deviceCount": devicesInRoom.count,
+                    "onCount": onCount
+                ]
+            }
+            return jsonResponse(["rooms": roomData])
+        }
+        
+        if method == "GET" && path.hasPrefix("/room/") && !path.contains("/on") && !path.contains("/off") && !path.contains("/device/") {
+            let roomName = normalizeName(String(path.dropFirst("/room/".count)))
+            let devicesInRoom = homeKitManager.devices.filter { 
+                $0.roomName?.lowercased() == roomName.lowercased() 
+            }
+            if devicesInRoom.isEmpty {
+                return errorResponse(404, "Room '\(roomName)' not found")
+            }
+            return jsonResponse([
+                "room": roomName,
+                "devices": devicesInRoom.map { deviceToDict($0) }
+            ])
+        }
+        
+        if method == "POST" && path.hasPrefix("/room/") && path.hasSuffix("/on") && !path.contains("/device/") {
+            let roomName = normalizeName(String(path.dropFirst("/room/".count).dropLast("/on".count)))
+            let devicesInRoom = homeKitManager.devices.filter { 
+                $0.roomName?.lowercased() == roomName.lowercased() 
+            }
+            if devicesInRoom.isEmpty {
+                return errorResponse(404, "Room '\(roomName)' not found")
+            }
+            
+            var successCount = 0
+            let group = DispatchGroup()
+            
+            for device in devicesInRoom where !device.isOn {
+                group.enter()
+                homeKitManager.setDeviceState(device, on: true, brightness: nil) { success in
+                    if success { successCount += 1 }
+                    group.leave()
+                }
+            }
+            
+            _ = group.wait(timeout: .now() + 10)
+            return jsonResponse(["success": true, "room": roomName, "devicesChanged": successCount])
+        }
+        
+        if method == "POST" && path.hasPrefix("/room/") && path.hasSuffix("/off") && !path.contains("/device/") {
+            let roomName = normalizeName(String(path.dropFirst("/room/".count).dropLast("/off".count)))
+            let devicesInRoom = homeKitManager.devices.filter { 
+                $0.roomName?.lowercased() == roomName.lowercased() 
+            }
+            if devicesInRoom.isEmpty {
+                return errorResponse(404, "Room '\(roomName)' not found")
+            }
+            
+            var successCount = 0
+            let group = DispatchGroup()
+            
+            for device in devicesInRoom where device.isOn {
+                group.enter()
+                homeKitManager.setDeviceState(device, on: false, brightness: nil) { success in
+                    if success { successCount += 1 }
+                    group.leave()
+                }
+            }
+            
+            _ = group.wait(timeout: .now() + 10)
+            return jsonResponse(["success": true, "room": roomName, "devicesChanged": successCount])
+        }
+        
+        // Room-scoped device control: /room/{room}/device/{device}/...
+        if path.hasPrefix("/room/") && path.contains("/device/") {
+            // Parse: /room/{room}/device/{device}/{action}
+            let withoutPrefix = String(path.dropFirst("/room/".count))
+            guard let deviceIndex = withoutPrefix.range(of: "/device/") else {
+                return errorResponse(400, "Invalid path")
+            }
+            
+            let roomName = normalizeName(String(withoutPrefix[..<deviceIndex.lowerBound]))
+            let afterDevice = String(withoutPrefix[deviceIndex.upperBound...])
+            
+            // Find device and action
+            var deviceName: String
+            var action: String? = nil
+            
+            if let actionIndex = afterDevice.lastIndex(of: "/") {
+                deviceName = normalizeName(String(afterDevice[..<actionIndex]))
+                action = String(afterDevice[afterDevice.index(after: actionIndex)...])
+            } else {
+                deviceName = normalizeName(afterDevice)
+            }
+            
+            // Find device in specific room
+            guard let device = homeKitManager.devices.first(where: { 
+                $0.name.lowercased() == deviceName.lowercased() && 
+                $0.roomName?.lowercased() == roomName.lowercased()
+            }) else {
+                return errorResponse(404, "Device '\(deviceName)' not found in room '\(roomName)'")
+            }
+            
+            // GET /room/{room}/device/{device} - status
+            if method == "GET" && action == nil {
+                return jsonResponse(deviceToDict(device))
+            }
+            
+            // POST /room/{room}/device/{device}/toggle
+            if method == "POST" && action == "toggle" {
+                let semaphore = DispatchSemaphore(value: 0)
+                var success = false
+                homeKitManager.toggleDevice(device) { result in
+                    success = result
+                    semaphore.signal()
+                }
+                _ = semaphore.wait(timeout: .now() + 10)
+                if success {
+                    if let updated = homeKitManager.getDevice(byId: device.id) {
+                        return jsonResponse(["success": true, "device": deviceToDict(updated)])
+                    }
+                    return jsonResponse(["success": true])
+                }
+                return errorResponse(500, "Failed to toggle device")
+            }
+            
+            // POST /room/{room}/device/{device}/on
+            if method == "POST" && action == "on" {
+                let semaphore = DispatchSemaphore(value: 0)
+                var success = false
+                homeKitManager.setDeviceState(device, on: true, brightness: nil) { result in
+                    success = result
+                    semaphore.signal()
+                }
+                _ = semaphore.wait(timeout: .now() + 10)
+                return success ? jsonResponse(["success": true]) : errorResponse(500, "Failed")
+            }
+            
+            // POST /room/{room}/device/{device}/off
+            if method == "POST" && action == "off" {
+                let semaphore = DispatchSemaphore(value: 0)
+                var success = false
+                homeKitManager.setDeviceState(device, on: false, brightness: nil) { result in
+                    success = result
+                    semaphore.signal()
+                }
+                _ = semaphore.wait(timeout: .now() + 10)
+                return success ? jsonResponse(["success": true]) : errorResponse(500, "Failed")
+            }
+            
+            // POST /room/{room}/device/{device}/set
+            if method == "POST" && action == "set" {
+                let on = body?["on"] as? Bool ?? device.isOn
+                let brightness = body?["brightness"] as? Int
+                let semaphore = DispatchSemaphore(value: 0)
+                var success = false
+                homeKitManager.setDeviceState(device, on: on, brightness: brightness) { result in
+                    success = result
+                    semaphore.signal()
+                }
+                _ = semaphore.wait(timeout: .now() + 10)
+                return success ? jsonResponse(["success": true]) : errorResponse(500, "Failed")
+            }
+            
+            return errorResponse(400, "Unknown action '\(action ?? "")'")
+        }
+        
         // MARK: - Scenes
         
         if method == "GET" && path == "/scenes" {
@@ -218,7 +429,7 @@ class HTTPServer {
         
         if method == "POST" && path.hasPrefix("/scene/") && path.hasSuffix("/trigger") {
             let pathWithoutTrigger = String(path.dropLast("/trigger".count))
-            let id = String(pathWithoutTrigger.dropFirst("/scene/".count))
+            let id = normalizeName(String(pathWithoutTrigger.dropFirst("/scene/".count)))
             
             let semaphore = DispatchSemaphore(value: 0)
             var success = false
@@ -276,6 +487,19 @@ class HTTPServer {
     }
     
     // MARK: - Helpers
+    
+    // Convert underscores to spaces in names
+    private func normalizeName(_ name: String) -> String {
+        return name.replacingOccurrences(of: "_", with: " ")
+    }
+    
+    private func exampleBody(for device: HomeDevice) -> [String: Any] {
+        var example: [String: Any] = ["on": true]
+        if device.type == .light {
+            example["brightness"] = 80
+        }
+        return example
+    }
     
     private func deviceToDict(_ device: HomeDevice) -> [String: Any] {
         var dict: [String: Any] = [

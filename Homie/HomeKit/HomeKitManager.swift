@@ -2,7 +2,7 @@ import Foundation
 import HomeKit
 import os.log
 
-private let logger = Logger(subsystem: "com.homie.app", category: "HomeKit")
+private let logger = Logger(subsystem: "com.ghostmfr.lilhomie", category: "HomeKit")
 
 extension Notification.Name {
     static let devicesUpdated = Notification.Name("devicesUpdated")

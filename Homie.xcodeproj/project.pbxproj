@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 77;
+	objectVersion = 63;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -26,6 +26,7 @@
 		AE125939142B879E302A8621 /* HomeKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEFCD4E78FA7FB3F9B1F4F86 /* HomeKitManager.swift */; };
 		B5C3BDCC77345AE92EB517DE /* RuleEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E38E9F04F28CABF500CCB50 /* RuleEngine.swift */; };
 		B9ADE5E6ACCC37413F91B23B /* HomieCharacter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D53186C121A44DCE23BE344 /* HomieCharacter.swift */; };
+		BC3D46D66BDE4EEBA90B81F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 17BEF66590DD49D2B4D995B7 /* Assets.xcassets */; };
 		CC0BFF6C39E3F601EF64340C /* ServiceManagement.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3E9147AE4C4D3A35A11AA8AA /* ServiceManagement.framework */; };
 		CC36CC597D7078716A1E47E9 /* HTTPServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2C90F16859DB7E4D4241E36 /* HTTPServer.swift */; };
 		DB56D3A479DFA8D39CECC477 /* HomeKitManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEFCD4E78FA7FB3F9B1F4F86 /* HomeKitManager.swift */; };
@@ -34,8 +35,9 @@
 
 /* Begin PBXFileReference section */
 		00290E6650F1783B4C763E6A /* HomieMacApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomieMacApp.swift; sourceTree = "<group>"; };
-		00E6DF1970F015F5A1F80E7D /* Homie.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = Homie.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		00E6DF1970F015F5A1F80E7D /* Homie.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Homie.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		10F78ED67B2CEE1824DAF8B6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		17BEF66590DD49D2B4D995B7 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		200B9DE9E0DA058D5F64C9AA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = AppKit.framework; sourceTree = "<group>"; };
 		24596DAE42CBC07BBB14B1D6 /* ServiceManagement.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = ServiceManagement.framework; sourceTree = "<group>"; };
 		24F75566920457F4B5309CA7 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
@@ -51,7 +53,7 @@
 		98A0C01A757EDD52050C1B23 /* MacAppMonitor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MacAppMonitor.swift; sourceTree = "<group>"; };
 		A1533CD4FE3A5A319E0E3767 /* HomeKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HomeKit.framework; path = System/Library/Frameworks/HomeKit.framework; sourceTree = SDKROOT; };
 		A2C90F16859DB7E4D4241E36 /* HTTPServer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPServer.swift; sourceTree = "<group>"; };
-		D957B53CE8B8A9D9F6D552BF /* HomieMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = HomieMac.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D957B53CE8B8A9D9F6D552BF /* HomieMac.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; name = HomieMac.app; path = "lil homie.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		DEFCD4E78FA7FB3F9B1F4F86 /* HomeKitManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeKitManager.swift; sourceTree = "<group>"; };
 		E056276B11075CD3826DDE9C /* HomeKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = HomeKit.framework; sourceTree = "<group>"; };
 		E7DC16A114168BBAD56A1609 /* Network.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Network.framework; path = System/Library/Frameworks/Network.framework; sourceTree = SDKROOT; };
@@ -94,6 +96,7 @@
 		2DB57F23902F67A6A61C21B3 /* Homie */ = {
 			isa = PBXGroup;
 			children = (
+				17BEF66590DD49D2B4D995B7 /* Assets.xcassets */,
 				B18F96FB8C684D33789A9D4B /* API */,
 				D217FC1C471BE34DE7E1F152 /* App */,
 				F786B5A9F7670D822122C892 /* Context */,
@@ -205,6 +208,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 9BA78EC2779E4CC0B586C6A1 /* Build configuration list for PBXNativeTarget "Homie" */;
 			buildPhases = (
+				AAB0851DAF2944D185A01B81 /* Resources */,
 				85EC91F0037AF85F2BCFA348 /* Sources */,
 				E9706711B01558C50992BA4C /* Frameworks */,
 			);
@@ -265,7 +269,6 @@
 			);
 			mainGroup = 6C8A8ECC6756DA77CD0CACCE;
 			minimizedProjectReferenceProxies = 1;
-			preferredProjectObjectVersion = 77;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -274,6 +277,17 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AAB0851DAF2944D185A01B81 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BC3D46D66BDE4EEBA90B81F0 /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		4FA707BD738216C925F96A00 /* Sources */ = {
@@ -323,18 +337,19 @@
 					"\".\"",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "lil homie";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHomeKitUsageDescription = "Homie needs access to your HomeKit devices to display and control them.";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Homie runs a local HTTP server for automation integrations.";
+				INFOPLIST_KEY_LSUIElement = NO;
+				INFOPLIST_KEY_NSHomeKitUsageDescription = "lil homie needs access to your HomeKit devices to display and control them.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "lil homie runs a local HTTP server for automation integrations.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.homie.mac;
-				PRODUCT_NAME = Homie;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ghostmfr.lilhomie;
+				PRODUCT_NAME = "lil homie";
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -351,9 +366,10 @@
 				DEVELOPMENT_TEAM = Y7HZ9MR5W8;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHomeKitUsageDescription = "Homie needs access to your HomeKit devices to display and control them.";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Homie runs a local HTTP server for automation integrations.";
+				INFOPLIST_KEY_CFBundleDisplayName = "lil homie";
+				INFOPLIST_KEY_LSUIElement = NO;
+				INFOPLIST_KEY_NSHomeKitUsageDescription = "lil homie needs access to your HomeKit devices to display and control them.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "lil homie runs a local HTTP server for automation integrations.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -361,7 +377,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ghostmfr.homie;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ghostmfr.lilhomie;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;
@@ -385,18 +401,19 @@
 					"\".\"",
 				);
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = "lil homie";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHomeKitUsageDescription = "Homie needs access to your HomeKit devices to display and control them.";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Homie runs a local HTTP server for automation integrations.";
+				INFOPLIST_KEY_LSUIElement = NO;
+				INFOPLIST_KEY_NSHomeKitUsageDescription = "lil homie needs access to your HomeKit devices to display and control them.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "lil homie runs a local HTTP server for automation integrations.";
 				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.homie.mac;
-				PRODUCT_NAME = Homie;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ghostmfr.lilhomie;
+				PRODUCT_NAME = "lil homie";
 				SDKROOT = macosx;
 			};
 			name = Debug;
@@ -476,9 +493,10 @@
 				DEVELOPMENT_TEAM = Y7HZ9MR5W8;
 				ENABLE_HARDENED_RUNTIME = NO;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_LSUIElement = YES;
-				INFOPLIST_KEY_NSHomeKitUsageDescription = "Homie needs access to your HomeKit devices to display and control them.";
-				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "Homie runs a local HTTP server for automation integrations.";
+				INFOPLIST_KEY_CFBundleDisplayName = "lil homie";
+				INFOPLIST_KEY_LSUIElement = NO;
+				INFOPLIST_KEY_NSHomeKitUsageDescription = "lil homie needs access to your HomeKit devices to display and control them.";
+				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "lil homie runs a local HTTP server for automation integrations.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -486,7 +504,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.ghostmfr.homie;
+				PRODUCT_BUNDLE_IDENTIFIER = com.ghostmfr.lilhomie;
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = YES;

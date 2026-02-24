@@ -199,6 +199,7 @@ class HTTPServer {
                 }
             }
             
+            let toggledIsOn = !device.isOn
             let semaphore = DispatchSemaphore(value: 0)
             var success = false
             
@@ -211,9 +212,20 @@ class HTTPServer {
             
             if success {
                 if let updated = homeKitManager.getDevice(byId: device.id) {
-                    return jsonResponse(["success": true, "device": deviceToDict(updated)])
+                    var deviceDict = deviceToDict(updated)
+                    // Cached state can lag this request; return the intended post-toggle state.
+                    deviceDict["isOn"] = toggledIsOn
+                    return jsonResponse(["success": true, "device": deviceDict])
                 }
-                return jsonResponse(["success": true])
+                return jsonResponse([
+                    "success": true,
+                    "device": [
+                        "id": device.id,
+                        "name": device.name,
+                        "type": device.type.rawValue,
+                        "isOn": toggledIsOn
+                    ]
+                ])
             }
             return errorResponse(500, "Failed to toggle device")
         }
@@ -363,6 +375,7 @@ class HTTPServer {
             
             // POST /room/{room}/device/{device}/toggle
             if method == "POST" && action == "toggle" {
+                let toggledIsOn = !device.isOn
                 let semaphore = DispatchSemaphore(value: 0)
                 var success = false
                 homeKitManager.toggleDevice(device) { result in
@@ -372,9 +385,20 @@ class HTTPServer {
                 _ = semaphore.wait(timeout: .now() + 10)
                 if success {
                     if let updated = homeKitManager.getDevice(byId: device.id) {
-                        return jsonResponse(["success": true, "device": deviceToDict(updated)])
+                        var deviceDict = deviceToDict(updated)
+                        // Cached state can lag this request; return the intended post-toggle state.
+                        deviceDict["isOn"] = toggledIsOn
+                        return jsonResponse(["success": true, "device": deviceDict])
                     }
-                    return jsonResponse(["success": true])
+                    return jsonResponse([
+                        "success": true,
+                        "device": [
+                            "id": device.id,
+                            "name": device.name,
+                            "type": device.type.rawValue,
+                            "isOn": toggledIsOn
+                        ]
+                    ])
                 }
                 return errorResponse(500, "Failed to toggle device")
             }
